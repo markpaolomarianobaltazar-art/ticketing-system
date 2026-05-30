@@ -1,23 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>User Management</title>
+    <title>Admin User Management</title>
     <link rel="stylesheet" href="/styles/style.css">
 </head>
 <body>
     <%- include('header') %>
 <div class="container">
     <div class="header">
-        <h2>User Management</h2>
-        <a href="/admin" class="btn">Back to Admin</a>
-        <a href="/admin/users/new" class="btn">+ Add User</a>
-        <a href="#" onclick="confirmLogout()" class="btn logout-btn">Logout</a>
+        <div class="brand-section">
+            <h2>
+                <span class="brand-highlight">M&B</span> IT Solutions
+            </h2>
+        
+            <p class="company-tagline">
+                <%= dashboardTitle %> • Welcome, 
+                <strong><%= user.name %></strong>
+            </p>
+        </div>
+        <div class="header-actions">
+            <a href="/admin" class="btn">Back</a>
+            <a href="/admin/users/new" class="btn">+ Add User</a>
+            <a href="#" onclick="confirmLogout()" class="btn logout-btn">
+                Logout
+            </a>
+        </div>
     </div>
 
-    <div class="card">
+    <div class="content">
         <h3>All Users</h3>
-
-        <table>
+        <table class="table admin-users-table">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -44,29 +56,58 @@
                             hour: '2-digit',
                             minute: '2-digit'
                         }) %></td>
-                        <td><%= u.status %></td>
                         <td>
+                            <span class="status-badge status-<%= u.status %>">
+                                <%= u.status.charAt(0).toUpperCase() + u.status.slice(1) %>
+                            </span>
+                        </td>
+                        <td class="action-cell">
                             <% if (u.user_id !== user.id) { %>
-                                <form action="/admin/users/update-role" method="POST">
-                                    <input type="hidden" name="user_id" value="<%= u.user_id %>">
-                                    <select name="role">
-                                        <option value="customer" <%= u.role === 'customer' ? 'selected' : '' %>>Customer</option>
-                                        <option value="technician" <%= u.role === 'technician' ? 'selected' : '' %>>Technician</option>
-                                        <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>Admin</option>
-                                    </select>
-                                    <button type="submit" class="btn">Update</button>
-                                </form>
-                                <a href="/admin/users/edit/<%= u.user_id %>" class="btn">Edit</a>
-                                <form action="/admin/users/toggle-status" method="POST">
-                                    <input type="hidden" name="user_id" value="<%= u.user_id %>">
-                                    <input type="hidden" name="status" value="<%= u.status === 'active' ? 'inactive' : 'active' %>">
-                                    <button type="submit" class="btn">
-                                        <%= u.status === 'active' ? 'Deactivate' : 'Activate' %>
+                                <div class="action-wrapper">
+                                    <button type="button" class="btn small-btn" onclick="toggleActionMenu(this)">
+                                        Action
                                     </button>
-                                </form>
+                                    <div class="action-menu hidden">
+                                        <button type="button" class="btn small-btn role-toggle-btn">
+                                            Update Role
+                                        </button>
+                                        <div class="role-panel">
+                                            <form action="/admin/users/update-role" method="POST" class="role-form confirm-role-form">
+                                                <input type="hidden" name="user_id" value="<%= u.user_id %>">
+                                                <select name="role" class="role-select">
+                                                    <option value="customer" <%= u.role === 'customer' ? 'selected' : '' %>>
+                                                        Customer
+                                                    </option>
+                                                    <option value="technician" <%= u.role === 'technician' ? 'selected' : '' %>>
+                                                        Technician
+                                                    </option>
+                                                    <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>
+                                                        Admin
+                                                    </option>
+                                                </select>
+                                                <button type="submit" class="btn icon-btn">
+                                                    Save
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <a href="/admin/users/edit/<%= u.user_id %>" class="btn small-btn edit-user-btn">
+                                            Edit User
+                                        </a>
+                                        <form action="/admin/users/toggle-status" method="POST" class="toggle-form confirm-toggle-form">
+                                            <input type="hidden" name="user_id" value="<%= u.user_id %>">
+                                            <input type="hidden" name="status" value="<%= u.status === 'active' ? 'inactive' : 'active' %>">
+                                            <button type="submit" class="btn small-btn btn-danger">
+                                                <%= u.status === 'active' ? 'Deactivate' : 'Activate' %>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
                             <% } else { %>
-                                <span>You</span>
+                        
+                                <span class="you-label">You</span>
+                        
                             <% } %>
+                        
                         </td>
                     </tr>
                 <% }) %>
@@ -76,14 +117,71 @@
     </div>
 
 </div>
-
+<%- include('footer') %>
 </body>
 </html>
 
 <script>
+    function toggleActionMenu(button) {
+        const allMenus = document.querySelectorAll('.action-menu');
+        const currentMenu =  button.parentElement.querySelector('.action-menu');
+        allMenus.forEach(menu => {
+            if (menu !== currentMenu) {
+                menu.classList.add('hidden');
+            }
+        });
+        currentMenu.classList.toggle('hidden');
+    }
     function confirmLogout() {
         showConfirm("Are you sure you want to logout?", function () {
             window.location.href = "/logout";
         });
     }
+
+    document.querySelectorAll('.role-toggle-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        const actionMenu = button.closest('.action-menu');
+        const rolePanel = actionMenu.querySelector('.role-panel');
+        rolePanel.classList.toggle('show');
+        });
+    });
+
+    document.querySelectorAll('.confirm-toggle-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const isDeactivate =  form.querySelector('input[name="status"]').value === 'inactive';
+        showConfirm( isDeactivate ? 'Deactivate this user?' : 'Activate this user?', () => {
+                form.submit();
+            }
+            );
+        });
+    });
+
+    document.querySelectorAll('.edit-user-btn').forEach(button => {
+    button.addEventListener('click', function(e) { e.preventDefault();
+        const targetUrl = button.href;
+        showConfirm(
+            'Proceed to edit this user?',
+            () => {
+                window.location.href = targetUrl;
+            }
+            );
+        });
+    });
+    document.querySelectorAll('.confirm-role-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const selectedRole = form.querySelector('select[name="role"]').value;
+            showConfirm( `Change user role to ${selectedRole}?`, () => {
+                    form.submit();
+                }
+            );
+        });
+    });
+
 </script>
+<% if (modalMessage) { %>
+    <script>
+        showAlert("<%= modalMessage %>");
+    </script>
+<% } %>

@@ -8,37 +8,72 @@
 <body>
 <div class="container">
     <div class="header">
-        <h2>Create New User</h2>
-        <a href="/admin/users" class="btn">Back</a>
-        <a href="#" onclick="confirmLogout()" class="btn logout-btn">Logout</a>
+        <div class="brand-section">
+            <h2>
+                <span class="brand-highlight">M&B</span> IT Solutions
+            </h2>
+        
+            <p class="company-tagline">
+                <%= dashboardTitle %> • Welcome, 
+                <strong><%= user.name %></strong>
+            </p>
+        </div>
+        <div class="header-actions">
+            <a href="/admin/users" class="btn">Back</a>
+            <a href="#" onclick="confirmLogout()" class="btn logout-btn">
+                Logout
+            </a>
+        </div>
     </div>
-    <div class="card">
-        <form action="/admin/users/create" method="POST">
+    <div class="create-user-card">
+        <form action="/admin/users/create" method="POST"  id="createUserForm">
             <label>Full Name</label>
-            <input type="text" name="full_name" required>
+            <input type="text" name="full_name" value="<%= formData.full_name || '' %>" required>
             <label>Email</label>
-            <input type="email" name="email" required>
+            <input type="email" name="email" value="<%= formData.email || '' %>" required>
             <label>Password</label>
             <input type="password" name="password" required>
             <label>Role</label>
             <select name="role">
-                <option value="customer">Customer</option>
-                <option value="technician">Technician</option>
-                <option value="admin">Admin</option>
+                <option value="customer"
+                <%= formData.role === 'customer' ? 'selected' : '' %>>
+                Customer
+                </option>
+                <option value="technician" <%= formData.role === 'technician' ? 'selected' : '' %>>
+                    Technician
+                </option>
+                <option value="admin" <%= formData.role === 'admin' ? 'selected' : '' %>>
+                    Admin
+                </option>
             </select>
             <label>Contact Number (optional)</label>
-            <input type="text" name="contact" placeholder="e.g. 09123456789">
+            <input type="text" name="contact" value="<%= formData.contact || '' %>" placeholder="e.g. 09123456789">
             <button type="submit" class="btn">Create User</button>
         </form>
     </div>
 </div>
+<%- include('footer') %>
 </body>
 </html>
 
 <script>
+    document.getElementById('createUserForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    showConfirm('Are the details correct?',() => {
+            this.submit();
+            }
+        );
+    });
+
     function confirmLogout() {
         showConfirm("Are you sure you want to logout?", function () {
             window.location.href = "/logout";
         });
     }
 </script>
+
+<% if (modalMessage) { %>
+    <script>
+        showAlert("<%= modalMessage %>");
+    </script>
+<% } %>

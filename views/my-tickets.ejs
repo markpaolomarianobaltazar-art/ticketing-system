@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Technician Dashboard</title>
+    <title><%= dashboardTitle %> Dashboard</title>
     <link rel="stylesheet" href="/styles/style.css">
 </head>
 <%- include('header') %>
@@ -9,13 +9,31 @@
     <div class="container">
         <% const safeUrl = typeof currentUrl !== 'undefined' ? currentUrl : '/technician'; %>
         <div class="header">
-            <h2><%= dashtitle %></h2>
+            <div class="brand-section">
+                <h2>
+                    <span class="brand-highlight">M&B</span> IT Solutions
+                </h2>
+                <p class="company-tagline">
+                    <%= dashboardTitle %> • Welcome, 
+                    <strong><%= user.name %></strong>
+                </p>
+            </div>
             <div class="header-actions">
                 <a href="<%= backUrl %>" class="btn">Back</a>
                 <a href="#" onclick="confirmLogout()" class="btn logout-btn">Logout</a>
             </div>
+            
+        
         </div>
         <div class="content">
+            <div class="ticket-section">
+                <div class="ticket-title-group">
+                    <h3><%= viewtype %></h3>
+        
+                    <span class="ticket-count">
+                        <%= tickets.length %> Tickets
+                    </span>
+                </div>
             <table class="table">
                 <tr>
                     <th>ID</th>
@@ -35,25 +53,38 @@
                         <tr>
                             <td><%= ticket.ticket_id %></td>
                             <td><%= ticket.title %></td>
-                            <td><%= ticket.priority %></td>
-                            <td><%= ticket.status %></td>
-                            <td><%= new Date(ticket.created_at).toLocaleString('en-PH', {
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            }) %></td>
+                            <td>
+                                <span class="priority <%= ticket.priority.trim().toLowerCase() %>">
+                                    <%= ticket.priority %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-<%= ticket.status %>">
+                                    <%= ticket.status %>
+                                </span>
+                            </td>
+                            <td>
+                                <%= new Date(ticket.created_at).toLocaleString('en-PH', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) %>
+                            </td>
                             <td>
                                 <a href="/tickets/view/<%= ticket.ticket_id %>?backUrl=<%= safeUrl %>" class="btn">
                                     View
                                 </a>
                             </td>
+        
                         </tr>
                     <% }) %>
                 <% } %>
             </table>
         </div>
+        </div>
     </div>
+    <%- include('footer') %>
 </body>
 
 <script>

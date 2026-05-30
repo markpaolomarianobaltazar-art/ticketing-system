@@ -12,13 +12,18 @@
             <h2>
                 <span class="brand-highlight">M&B</span> IT Solutions
             </h2>
-    
+        
             <p class="company-tagline">
-                Technician Dashboard
+                <%= dashboardTitle %> • Welcome, 
+                <strong><%= user.name %></strong>
             </p>
         </div>
         <div class="header-actions">
+            <button id="viewDetailsBtn" class="btn btn-primary">
+                <%= showDashboardCard ? 'Hide your details' : 'View your details' %>
+            </button>
             <a href="#" class = "btn">Live Ticket Monitor</a>
+            
             <a href="/tickets/create?backUrl=<%= backUrl %>" class="btn create-btn">
                 + Create Ticket
             </a>
@@ -29,34 +34,65 @@
     </div>
 
     <div class="content">
-        <div class="dashboard-card">
-            <h3>Welcome, <%= user.name %></h3>
-            <div class="profile-info">
-                <div class="profile-contact">
-                    <span class="profile-label">
-                        Contact Number
-                    </span>
-                    <span class="profile-value">
-                        <%= user.contact ? user.contact : 'Not provided' %>
-                    </span>
+        <div id="dashboard-card" class="dashboard-card <%= showDashboardCard ? '' : 'hidden' %>">
+            <h3>Your Details</h3>
+            <div class="profile-details">
+                <div class="profile-info">
+                    <div class="profile-contact">
+                        <span class="profile-label">
+                            Full Name:
+                        </span>
+                        <span class="profile-value">
+                            <%= user.name %>
+                        </span>
+                    </div>
                 </div>
-                <button onclick="toggleContactForm(this)"
-                        class="btn small-btn">
-                    Edit
-                </button>
+                <div class="profile-info">
+                    <div class="profile-contact">
+                        <span class="profile-label">
+                            Email:
+                        </span>
+                        <span class="profile-value">
+                            <%= user.email %>
+                        </span>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-contact">
+                        <span class="profile-label">
+                            Role:
+                        </span>
+                        <span class="profile-value">
+                            <%= user.role %>
+                        </span>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-contact">
+                        <span class="profile-label">
+                            Contact Number:
+                        </span>
+                        <span class="profile-value">
+                            <%= user.contact ? user.contact : 'Not provided' %>
+                        </span>
+                    </div>
+                    <button onclick="toggleContactForm(this)"
+                            class="btn small-btn">
+                        Edit
+                    </button>
+                </div>
             </div>
             <div id="contactForm" class="contact-card" style="display: none;">
                 <p class="contact-title">
                     Update your contact number
                 </p>
                 <form id="contactFormSubmit" action="/update-contact" method="POST">
-                    <input type="hidden" name="redirectTo" value="/technician" />
+                    <input type="hidden" name="redirectTo" value="/technician">
                     <input type="text" name="contact" placeholder="Enter new contact" maxlength="20" pattern="[0-9]+" required>
                     <button type="button" class="btn" onclick="confirmSaveContact()">
                         Save
                     </button>
                 </form>
-        
             </div>
         </div>
 
@@ -163,6 +199,16 @@
         document.getElementById("contactFormSubmit").submit();
     });
     }
+    const viewDetailsBtn = document.getElementById('viewDetailsBtn');
+    const dashboardCard = document.getElementById('dashboard-card');
+    viewDetailsBtn.addEventListener('click', () => {
+        dashboardCard.classList.toggle('hidden');
+        if (dashboardCard.classList.contains('hidden')) {
+            viewDetailsBtn.textContent = 'View your details';
+        } else {
+            viewDetailsBtn.textContent = 'Hide your details';
+        }
+    });
 </script>
 
 <% if (modalMessage) { %>
@@ -172,6 +218,7 @@
         });
     </script>
 <% } %>
+<%- include('footer') %>
 </body>
 </html>
 

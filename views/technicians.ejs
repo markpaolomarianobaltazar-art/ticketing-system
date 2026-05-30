@@ -6,14 +6,26 @@
 </head>
 <%- include('header') %>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>Technician Management</h2>
-            <a href="<%= backUrl %>" class="btn">Back</a>
-            <a href="#" onclick="confirmLogout()" class="btn logout-btn">Logout</a>
+    <div class="header">
+        <div class="brand-section">
+            <h2>
+                <span class="brand-highlight">M&B</span> IT Solutions
+            </h2>
+        
+            <p class="company-tagline">
+                <%= dashboardTitle %> • Welcome, 
+                <strong><%= user.name %></strong>
+            </p>
         </div>
+        <div class="header-actions">
+            <a href="/admin/users" class="btn">Back</a>
+            <a href="#" onclick="confirmLogout()" class="btn logout-btn">
+                Logout
+            </a>
+        </div>
+    </div>
 
-<table>
+<table class="table ">
     <thead>
         <tr>
             <th>Name</th>
@@ -33,12 +45,13 @@
                 <td><%= tech.open_tickets || 0 %></td>
                 <td><%= tech.total_tickets || 0 %></td>
                 <td>
-                    <a href="/admin/technician/<%= tech.user_id %>/tickets">View Tickets</a>
+                    <a href="/admin/technician/<%= tech.user_id %>/tickets" class="btn small-btn">View Tickets</a>
                 </td>
             </tr>
         <% }) %>
     </tbody>
 </table>
+<%- include('footer') %>
 </body>
 
 <script>

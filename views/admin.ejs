@@ -8,12 +8,21 @@
 <body>
 <div class="container">
     <div class="header">
-        <h2>Admin Dashboard</h2>
+        <div class="brand-section">
+            <h2>
+                <span class="brand-highlight">M&B</span> IT Solutions
+            </h2>
+        
+            <p class="company-tagline">
+                <%= dashboardTitle %> • Welcome, 
+                <strong><%= user.name %></strong>
+            </p>
+        </div>
         <div>
             <a href="#" onclick="confirmLogout()" class="btn logout-btn">Logout</a>
         </div>
     </div>
-    <div class="card">
+    <div class="card overview-card">
         <h3>System Overview (Coming Soon)</h3>
         <p>Total tickets, open vs closed, technician workload</p>
     </div>
@@ -21,20 +30,20 @@
 
         <div class="card">
             <h3>User Management</h3>
-            <a href="/admin/users" class="btn">Manage Users</a>
             <p>View, create, edit, and assign roles.</p>
+            <a href="/admin/users" class="btn">Manage Users</a>
         </div>
 
         <div class="card">
             <h3>Ticket Control</h3>
-            <a href="/tickets/all" class="btn">Manage Tickets</a>
             <p>Assign technicians, close/reopen tickets.</p>
+            <a href="/tickets/all" class="btn">Manage Tickets</a>
         </div>
 
         <div class="card">
             <h3>Technician Management</h3>
-            <a href="/admin/technicians" class="btn">View Technicians</a>
             <p>Monitor and assign workload.</p>
+            <a href="/admin/technicians" class="btn">View Technicians</a>
         </div>
 
         <div class="card">
@@ -43,6 +52,7 @@
         </div>
     </div>
 </div>
+<%- include('footer') %>
 </body>
 </html>
 

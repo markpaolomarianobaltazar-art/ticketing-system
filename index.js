@@ -5,6 +5,7 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const mysql = require('mysql2/promise');
 const session = require('express-session');
+const getDashboardTitle = require('./helpers/dashboardTitle');
 const PORT = process.env.PORT || 3000;
 const ALLOWED_ROLES = ['admin', 'technician', 'customer'];
 app.use(express.urlencoded({ extended: true }));
@@ -141,6 +142,8 @@ app.get('/dashboard', checkActiveUser, async (req, res) => {
         const sessionUser = req.session.user;
         const modalMessage = req.session.modalMessage || null;
         req.session.modalMessage = null;
+        const showDashboardCard = req.session.showDashboardCard || false;
+        req.session.showDashboardCard = false;
         if (!sessionUser || !sessionUser.id) {
             return res.redirect('/');
         }
@@ -168,7 +171,9 @@ app.get('/dashboard', checkActiveUser, async (req, res) => {
             user: sessionUser,
             backUrl:'/dashboard',
             tickets,
-            modalMessage
+            dashboardTitle: getDashboardTitle(req.session.user.role),
+            modalMessage,
+            showDashboardCard
         });
     } catch (err) {
         console.error("Dashboard Error:", err);
@@ -181,6 +186,8 @@ app.get('/technician', checkActiveUser, requireRole('technician'), async (req, r
         const sessionUser = req.session.user;
         const modalMessage = req.session.modalMessage || null;
         req.session.modalMessage = null;
+        const showDashboardCard = req.session.showDashboardCard || false;
+        req.session.showDashboardCard = false;
         if (!sessionUser || !sessionUser.id) {
             return res.redirect('/');
         }
@@ -210,6 +217,8 @@ app.get('/technician', checkActiveUser, requireRole('technician'), async (req, r
             user: sessionUser,
             tickets,
             modalMessage,
+            showDashboardCard,
+            dashboardTitle: getDashboardTitle(req.session.user.role),
             backUrl:'/technician',
         });
     } catch (err) {
@@ -253,6 +262,7 @@ app.get('/admin', checkActiveUser, requireRole('admin'), async (req, res) => {
         res.render('admin', {
             user: sessionUser,
             tickets,
+            dashboardTitle: getDashboardTitle(req.session.user.role),
             modalMessage
         });
     } catch (err) {
@@ -271,8 +281,13 @@ app.get('/admin/users', checkActiveUser, requireRole('admin'), async (req, res) 
         const [rows] = await db.query(sql);
         res.render('admin-users', {
             user: req.session.user,
-            users: rows
+            users: rows,
+            modalMessage: req.session.modalMessage || null,
+            formData: req.session.formData || {},
+            dashboardTitle: getDashboardTitle(req.session.user.role)
         });
+        req.session.modalMessage = null;
+        req.session.formData = null;
     } catch (err) {
         console.error("Admin Users Error:", err);
         res.status(500).send("Something went wrong while loading users");
@@ -283,15 +298,18 @@ app.post('/admin/users/update-role', checkActiveUser, requireRole('admin'), asyn
     try {
         const { user_id, role } = req.body;
         if (!ALLOWED_ROLES.includes(role)) {
-            return res.send('Invalid role');
+            req.session.modalMessage = 'Invalid role';
+            return res.redirect('/admin/users');
         }
         if (parseInt(user_id) === req.session.user.id) {
-            return res.send('You cannot change your own role');
+            req.session.modalMessage = 'You cannot change your own role';
+            return res.redirect('/admin/users');
         }
         const sql = 'UPDATE users SET role = ? WHERE user_id = ?';
         await db.query(sql, [
             role, 
             user_id]);
+        req.session.modalMessage = 'Role updated successfully';
         res.redirect('/admin/users');
     } catch (err) {
         console.error("Update Role Error:", err);
@@ -301,20 +319,30 @@ app.post('/admin/users/update-role', checkActiveUser, requireRole('admin'), asyn
 
 app.get('/admin/users/new', checkActiveUser, requireRole('admin'), (req, res) => {
     res.render('admin-create-user', {
-        user: req.session.user
+        user: req.session.user,
+        modalMessage: req.session.modalMessage || null,
+        formData: req.session.formData || {},
+        dashboardTitle: getDashboardTitle(req.session.user.role),
     });
+    req.session.modalMessage = null;
+    req.session.formData = null;
 });
 
 app.post('/admin/users/create', checkActiveUser, requireRole('admin'), async (req, res) => {
     try {
         const { full_name, email, password, role, contact } = req.body;
+        const formData = {full_name, email, role, contact};
         if (!ALLOWED_ROLES.includes(role)) {
-            return res.send('Invalid role');
+            req.session.modalMessage = 'Invalid role';
+            req.session.formData = formData;
+            return res.redirect('/admin/users/new');
         }
         const checkSql = 'SELECT user_id FROM users WHERE email = ?';
         const [existing] = await db.query(checkSql, [email]);
         if (existing.length > 0) {
-            return res.send('Email already exists');
+            req.session.modalMessage = 'Email already exists';
+            req.session.formData = formData;
+            return res.redirect('/admin/users/new');
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const insertSql = `
@@ -327,6 +355,8 @@ app.post('/admin/users/create', checkActiveUser, requireRole('admin'), async (re
             hashedPassword,
             role,
             contact || null]);
+        req.session.modalMessage = 'User created successfully';
+        req.session.formData = null;
         res.redirect('/admin/users');
 
     } catch (err) {
@@ -338,24 +368,27 @@ app.post('/admin/users/create', checkActiveUser, requireRole('admin'), async (re
 app.post('/admin/users/toggle-status', checkActiveUser, requireRole('admin'), async (req, res) => {
     try{
         const { user_id, status } = req.body;
+        const displayStatus = status.charAt(0).toUpperCase() + status.slice(1);
         if (!user_id || isNaN(user_id)) {
-            return res.send('Invalid user ID');
+            req.session.modalMessage = 'Invalid user ID';
+            return res.redirect('/admin/users');
         }
         if (parseInt(user_id) === req.session.user.id) {
-            return res.send('You cannot change your own status');
+            req.session.modalMessage = 'You cannot change your own status';
+            return res.redirect('/admin/users');
         }
         const allowedStatus = ['active', 'inactive'];
         if (!allowedStatus.includes(status)) {
-            return res.send('Invalid status');
+            req.session.modalMessage = 'Invalid Status';
+            return res.redirect('/admin/users');
         }
         const sql = 'UPDATE users SET status = ? WHERE user_id = ?';
-        const [result] = await db.query(sql, [
-            status, 
-            user_id
-        ]);
+        const [result] = await db.query(sql, [ status,  user_id ]);
         if (result.affectedRows === 0) {
-            return res.send('User not found');
+            req.session.modalMessage = 'User not found';
+            return res.redirect('/admin/users');
         }
+        req.session.modalMessage = 'User Status set to '+displayStatus;
         res.redirect('/admin/users');
     }
     catch (err) {
@@ -378,6 +411,7 @@ app.get('/admin/users/edit/:id', checkActiveUser, requireRole('admin'), async (r
         }
         res.render('admin-edit-user', {
             user: req.session.user,
+            dashboardTitle: getDashboardTitle(req.session.user.role),
             editUser: result[0]
         });
     }
@@ -451,7 +485,9 @@ app.get('/admin/technicians', checkActiveUser, requireRole('admin'), async (req,
             return res.status(404).send("Technician not found");
         }
         res.render('technicians', { 
+            user: req.session.user,
             technicians: rows,
+            dashboardTitle: getDashboardTitle(req.session.user.role),
             backUrl: '/admin'
         });
 
@@ -525,6 +561,7 @@ app.post('/forgot-password', async (req, res) => {
 app.get('/tickets/create', checkActiveUser, async (req, res) => {
     try {
         const role = req.session.user.role;
+        const user=req.session.user;
         const userId = req.session.user.id;
         const backUrl = req.query.backUrl;
         const modalMessage = req.session.modalMessage || null;
@@ -534,6 +571,7 @@ app.get('/tickets/create', checkActiveUser, async (req, res) => {
             return res.redirect('/');
         }
         let technicians = [];
+        
         if (role === 'technician' || role === 'admin') {
             const sql = `
                 SELECT user_id, full_name 
@@ -544,11 +582,13 @@ app.get('/tickets/create', checkActiveUser, async (req, res) => {
             technicians = rows;
         }
         res.render('create-ticket', {
+            user: user,
             role,
             technicians,
             backUrl,
             modalMessage,
             formData,
+            dashboardTitle: getDashboardTitle(req.session.user.role),
             currentUserId: role === 'technician' ? userId : null
         });
 
@@ -643,6 +683,7 @@ app.get('/tickets/view/:id', checkActiveUser, async (req, res) => {
         const ticketId = req.params.id;
         const backUrl = req.query.backUrl;
         const formData = req.session.formData || '';
+        const user=req.session.user;
         req.session.formData = null;
         if (!ticketId || isNaN(ticketId)) {
             return res.send("Invalid ticket ID");
@@ -692,9 +733,11 @@ app.get('/tickets/view/:id', checkActiveUser, async (req, res) => {
             comments,
             technicians,
             role,
+            user: user,
             userId,
             formData,
             modalMessage,
+            dashboardTitle: getDashboardTitle(req.session.user.role),
             backUrl: backUrl || (
                 role === 'admin'
                     ? '/admin'
@@ -714,9 +757,7 @@ app.get('/tickets/my', checkActiveUser, async (req, res) => {
     try {
         const userId = req.session.user.id;
         const role = req.session.user.role;
-        if (!userId) {
-            return res.redirect('/');
-        }
+        const user=req.session.user;
         const sql = `
             SELECT * FROM tickets
             WHERE created_by = ? OR assigned_to = ?
@@ -727,7 +768,9 @@ app.get('/tickets/my', checkActiveUser, async (req, res) => {
         const [rows] = await db.query(sql, [userId, userId]);
         res.render('my-tickets', { 
             tickets: rows,
-            dashtitle: 'My Tickets',
+            user: user,
+            dashboardTitle: getDashboardTitle(req.session.user.role),
+            viewtype: 'My Tickets',
             currentUrl: '/tickets/my',
             backUrl: role === 'admin' 
                 ? '/admin' 
@@ -745,12 +788,10 @@ app.get('/tickets/my', checkActiveUser, async (req, res) => {
 app.get('/tickets/all', checkActiveUser, async (req, res) => {
     try {
         const { role, id: userId } = req.session.user;
+        const user=req.session.user;
         const allowedRoles = ['admin', 'technician'];
         if (!allowedRoles.includes(role)) {
             return res.redirect('/dashboard');
-        }
-        if (!userId) {
-            return res.redirect('/');
         }
         const sql = `
             SELECT t.*, u.full_name AS created_by_name
@@ -762,8 +803,10 @@ app.get('/tickets/all', checkActiveUser, async (req, res) => {
         `;
         const [rows] = await db.query(sql);
         res.render('my-tickets', { 
+            user: user,
             tickets: rows,
-            dashtitle: 'All Tickets',
+            dashboardTitle:  getDashboardTitle(req.session.user.role),
+            viewtype: 'All Tickets',
             currentUrl: '/tickets/all',
             backUrl: role === 'admin' ? '/admin' : '/technician'
         });
@@ -974,6 +1017,7 @@ app.post('/update-contact', checkActiveUser, async (req, res) => {
         }
         req.session.user.contact = contact;
         req.session.modalMessage = "Contact number updated successfully";
+        req.session.showDashboardCard = true;
         res.redirect(redirectTo);
 
     } catch (err) {

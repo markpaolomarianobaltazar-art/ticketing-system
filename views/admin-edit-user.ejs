@@ -7,16 +7,27 @@
 <body>
     <%- include('header') %>
 <div class="container">
-
     <div class="header">
-        <h2>Edit User</h2>
-        <a href="/admin/users" class="btn">Back</a>
-        <a href="#" onclick="confirmLogout()" class="btn logout-btn">Logout</a>
-
+        <div class="brand-section">
+            <h2>
+                <span class="brand-highlight">M&B</span> IT Solutions
+            </h2>
+        
+            <p class="company-tagline">
+                <%= dashboardTitle %> • Welcome, 
+                <strong><%= user.name %></strong>
+            </p>
+        </div>
+        <div class="header-actions">
+            <a href="/admin/users" class="btn">Back</a>
+            <a href="#" onclick="confirmLogout()" class="btn logout-btn">
+                Logout
+            </a>
+        </div>
     </div>
 
-    <div class="card">
-        <form action="/admin/users/update" method="POST">
+    <div class="edit-user-card">
+        <form action="/admin/users/update" method="POST"  id="editUserForm">
 
             <input type="hidden" name="user_id" value="<%= editUser.user_id %>">
 
@@ -51,9 +62,18 @@
     </div>
 
 </div>
+<%- include('footer') %>
 </body>
 
 <script>
+    document.getElementById('editUserForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    showConfirm('Save changes to this user?',() => {
+            this.submit();
+        }
+    );
+
+});
     function confirmLogout() {
         showConfirm("Are you sure you want to logout?", function () {
             window.location.href = "/logout";
