@@ -484,11 +484,10 @@ app.get('/admin/technicians', checkActiveUser, requireRole('admin'), async (req,
         if (!rows) {
             return res.status(404).send("Technician not found");
         }
-        res.render('technicians', { 
+        res.render('admin-technicians', { 
             user: req.session.user,
             technicians: rows,
-            dashboardTitle: getDashboardTitle(req.session.user.role),
-            backUrl: '/admin'
+            dashboardTitle: getDashboardTitle(req.session.user.role)
         });
 
     } catch (err) {
@@ -497,30 +496,55 @@ app.get('/admin/technicians', checkActiveUser, requireRole('admin'), async (req,
     }
 });
 
-app.get('/admin/technician/:id/tickets', checkActiveUser, requireRole('admin'), async (req, res) => {
+app.get('/admin/technician/:id/tickets', checkActiveUser,requireRole('admin'),async (req, res) => {
     try {
         const techId = req.params.id;
-        
         if (!techId || isNaN(techId)) {
             return res.status(400).send("Invalid technician ID");
         }
-        const [[tech]] = await db.query(
-            "SELECT full_name FROM users WHERE user_id = ? AND role = 'technician'",
-            [techId]
-        );
+        const [[tech]] = await db.query(`
+            SELECT
+                user_id,
+                full_name,
+                email,
+                position
+            FROM users
+            WHERE user_id = ?
+            AND role = 'technician'
+        `, [techId]);
         if (!tech) {
             return res.status(404).send("Technician not found");
         }
-        const [tickets] = await db.query(
-            "SELECT * FROM tickets WHERE assigned_to = ?",
-            [techId]
-        );
-        res.render('my-tickets', {
+        const [[stats]] = await db.query(`
+            SELECT
+                COUNT(*) AS totalTickets,
+                SUM(CASE WHEN status != 'Closed' THEN 1 ELSE 0 END) AS openTickets,
+                SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) AS closedTickets
+            FROM tickets
+            WHERE assigned_to = ?
+        `, [techId]);
+        const [tickets] = await db.query(`
+            SELECT *
+            FROM tickets
+            WHERE assigned_to = ?
+            ORDER BY
+                CASE
+                    WHEN status = 'Open' THEN 1
+                    WHEN status = 'In Progress' THEN 2
+                    ELSE 3
+                END,
+                created_at DESC
+        `, [techId]);
+        res.render('admin-technicians-tickets', {
+            user: req.session.user,
             tickets,
+            tech,
+            stats,
             dashtitle: `${tech.full_name}'s Tickets`,
             currentUrl: `/admin/technician/${techId}/tickets`,
             backUrl: '/admin/technicians'
         });
+
     } catch (err) {
         console.error("Error fetching technician tickets:", err);
         res.status(500).send("Error loading tickets");
