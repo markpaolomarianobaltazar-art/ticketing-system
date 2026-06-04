@@ -23,8 +23,32 @@
         </div>
     </div>
     <div class="card overview-card">
-        <h3>System Overview (Coming Soon)</h3>
-        <p>Total tickets, open vs closed, technician workload</p>
+
+        <h3>System Overview</h3>
+    
+        <div class="overview-stats">
+            <div class="stat-box">
+                <span>Total Tickets</span>
+                <h2><%= stats.totalTickets || 0 %></h2>
+            </div>
+            <div class="stat-box">
+                <span>Open</span>
+                <h2><%= stats.openTickets || 0 %></h2>
+            </div>
+            <div class="stat-box">
+                <span>Closed</span>
+                <h2><%= stats.closedTickets || 0 %></h2>
+            </div>
+            <div class="stat-box">
+                <span>Technicians</span>
+                <h2><%= users.technicians || 0 %></h2>
+            </div>
+            <div class="stat-box">
+                <span>Customers</span>
+                <h2><%= users.customers || 0 %></h2>
+            </div>
+        </div>
+    
     </div>
     <div class="admin-grid">
 

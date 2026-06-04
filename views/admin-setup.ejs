@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Admin Account</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<%- include('header') %>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2><span class="brand-highlight">M&B</span> IT Solutions</h2>
+            <p class="company-tagline">Technical Support & Repair Services</p>
+        </div>
+    
+        <div class="content">
+            <h1>Initial System Setup</h1>
+            <p>Create the first administrator account to activate the ticketing system.</p>
+    
+            <div class="login-box">
+                <h3>Administrator Setup</h3>
+    
+                <form id="setupForm" action="/admin-setup" method="POST">
+                    <input type="text" name="full_name" placeholder="Full Name" value="<%= formData?.full_name || '' %>" required>
+                    <input type="email" name="email" placeholder="Email" value="<%= formData?.email || '' %>"required>
+                    <input type="password" name="password"placeholder="Password" required>
+                    <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+                    <button type="button" class="btn" onclick="confirmRegister()">
+                        Create Administrator
+                    </button>
+                </form>
+                <p class="setup-note">
+                    This account will have full administrative access to the system.
+                </p>
+            </div>
+        </div>
+    </div>
+    <%- include('footer') %>
+</body>
+</html>
+
+<script>
+    function confirmRegister() {
+        showConfirm("Are you sure all registration details are correct?", function () {
+            document.getElementById("setupForm").submit();
+        });
+    }
+
+    window.onload = function () {
+    const errorMessage = "<%= typeof errorMessage !== 'undefined' ? errorMessage : '' %>";
+    const successMessage = "<%= typeof successMessage !== 'undefined' ? successMessage : '' %>";
+    if (errorMessage) {
+        showAlert(errorMessage);
+    }
+    if (successMessage) {
+        showAlert(successMessage);
+    }
+    };
+    </script>
+
+    

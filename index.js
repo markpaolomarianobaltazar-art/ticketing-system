@@ -26,8 +26,101 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-app.get('/', (req, res) => {
-    res.render('index');
+app.get('/', async (req, res) => {
+    const [admins] = await db.query(`
+        SELECT user_id
+        FROM users
+        WHERE role = 'admin'
+        LIMIT 1
+    `);
+
+    if (admins.length === 0) {
+        return res.redirect('/admin-setup');
+    }
+
+    res.render('index', {
+        errorMessage: '',
+        successMessage: ''
+    });
+});
+
+app.get('/admin-setup', async (req, res) => {
+    try {
+        const [admins] = await db.query(`
+            SELECT user_id
+            FROM users
+            WHERE role = 'admin'
+            LIMIT 1
+        `);
+
+        if (admins.length > 0) {
+            return res.redirect('/');
+        }
+
+        res.render('admin-setup', {
+            errorMessage: '',
+            successMessage: '',
+            formData: {},
+        });
+        req.session.formData = null;
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.post('/admin-setup', async (req, res) => {
+    try {
+        const {full_name, email,password, confirm_password} = req.body;
+        const formData = {full_name, email};
+        const [admins] = await db.query(`
+            SELECT user_id
+            FROM users
+            WHERE role = 'admin'
+            LIMIT 1
+        `);
+        if (admins.length > 0) {
+            return res.redirect('/');
+        }
+        if (password !== confirm_password) {
+            return res.render('admin-setup', {
+                errorMessage: 'Passwords do not match.',
+                successMessage: '',
+                formData
+            });
+        }
+        const [existingUser] = await db.query(`
+            SELECT user_id
+            FROM users
+            WHERE email = ?
+        `, [email]);
+        if (existingUser.length > 0) {
+            return res.render('admin-setup', {
+                errorMessage: 'Email already exists.',
+                successMessage: '',
+                formData
+            });
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await db.query(`
+            INSERT INTO users (
+                email,
+                password,
+                full_name,
+                role,
+                status
+            )
+            VALUES (?, ?, ?, 'admin', 'active')
+        `, [email,hashedPassword,full_name]);
+        req.session.modalMessage = 'Admin account created successfully';
+        req.session.formData = null;
+        return res.redirect('/');
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
 });
 
 app.get('/register', (req, res) => {
@@ -227,6 +320,43 @@ app.get('/technician', checkActiveUser, requireRole('technician'), async (req, r
     }
 });
 
+app.get('/technician/live-monitor', checkActiveUser, requireRole('technician'),async (req, res) => {
+    try {
+        const sql = `
+            SELECT
+                t.*,
+                u.full_name AS created_by_name,
+                tech.full_name AS technician_name
+            FROM tickets t
+            JOIN users u
+                ON t.created_by = u.user_id
+            LEFT JOIN users tech
+                ON t.assigned_to = tech.user_id
+            WHERE t.status = 'Open'
+            ORDER BY t.created_at DESC
+        `;
+        const [tickets] = await db.query(sql);
+        const openTickets = tickets.length;
+        const unassignedTickets = tickets.filter(ticket => !ticket.assigned_to).length;
+        const p1Tickets = tickets.filter(ticket => ticket.priority === 'P1').length;
+        res.render('technician-livemonitor', {
+            user: req.session.user,
+            tickets,
+            openTickets,
+            unassignedTickets,
+            p1Tickets,
+            lastUpdated: new Date(),
+            dashboardTitle: getDashboardTitle(req.session.user.role),
+            currentUrl: '/technician/live-monitor',
+            backUrl: '/technician'
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Live monitor error');
+    }
+});
+
 app.get('/admin', checkActiveUser, requireRole('admin'), async (req, res) => {
     try {
         const sessionUser = req.session.user;
@@ -259,9 +389,25 @@ app.get('/admin', checkActiveUser, requireRole('admin'), async (req, res) => {
         `;
         const [rows] = await db.query(sql);
         const tickets = Array.isArray(rows) ? rows : [];
+        const [[stats]] = await db.query(`
+                SELECT
+                    COUNT(*) AS totalTickets,
+                    SUM(CASE WHEN status = 'Open' THEN 1 ELSE 0 END) AS openTickets,
+                    SUM(CASE WHEN status = 'Closed' THEN 1 ELSE 0 END) AS closedTickets
+                FROM tickets
+            `);
+        const [[users]] = await db.query(`
+            SELECT
+                SUM(CASE WHEN role = 'customer' THEN 1 ELSE 0 END) AS customers,
+                SUM(CASE WHEN role = 'technician' THEN 1 ELSE 0 END) AS technicians,
+                SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) AS admins
+            FROM users
+            `);
         res.render('admin', {
             user: sessionUser,
             tickets,
+            stats,
+            users,
             dashboardTitle: getDashboardTitle(req.session.user.role),
             modalMessage
         });
@@ -646,7 +792,7 @@ app.post('/tickets/create', checkActiveUser, async (req, res) => {
             req.session.formData = formData;
             return res.redirect(backUrl);
         }
-        const allowedPriorities = ['P1', 'P2', 'P3', 'P4'];
+        const allowedPriorities = ['P1', 'P2', 'P3', 'P4', 'P5'];
         if (!allowedPriorities.includes(priority)) {
             req.session.modalMessage = "Invalid priority";
             req.session.formData = formData;

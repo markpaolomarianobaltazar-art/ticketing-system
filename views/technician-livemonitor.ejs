@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Technician Dashboard</title>
+    <link rel="stylesheet" href="/styles/style.css">
+</head>
+<%- include('header') %>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brand-section">
+                <h2>
+                    <span class="brand-highlight">M&B</span> IT Solutions
+                </h2>
+            
+                <p class="company-tagline">
+                    <%= dashboardTitle %> • Welcome, 
+                    <strong><%= user.name %></strong>
+                </p>
+            </div>
+            <div>
+                <a href="/technician" class="btn">Back</a>
+                <a href="#" onclick="confirmLogout()" class="btn logout-btn">Logout</a>
+            </div>
+        </div>
+        <div class="monitor-container">
+            <div class="monitor-header">
+                <div class="monitor-title">
+                    <h1>Live Ticket Monitor</h1>
+                    <p class="refresh-info">
+                        Last Updated:
+                        <%= lastUpdated.toLocaleString() %>
+                    </p>
+                </div>
+                <div class="monitor-stats">
+                    <div class="monitor-stat-card">
+                        <span>Open Tickets</span>
+                        <h2><%= openTickets %></h2>
+                    </div>
+                    <div class="monitor-stat-card">
+                        <span>Unassigned</span>
+                        <h2><%= unassignedTickets %></h2>
+                    </div>
+                    <div class="monitor-stat-card p1-card">
+                        <span>P1 Tickets</span>
+                        <h2><%= p1Tickets %></h2>
+                    </div>
+                </div>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Priority</th>
+                        <th>Customer</th>
+                        <th>Assigned To</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% tickets.forEach(ticket => { %>
+                        <tr>
+                            <td>#<%= ticket.ticket_id %></td>
+                            <td>
+                                <span class="priority <%= ticket.priority.trim().toLowerCase() %>">
+                                    <%= ticket.priority %>
+                                </span>    
+                            </td>
+                            <td><%= ticket.created_by_name %></td>
+                            <td><%= ticket.technician_name || 'Unassigned' %></td>
+                            <td>
+                                <span class="status-badge status-<%= ticket.status %>">
+                                    <%= ticket.status %>
+                                </span>    
+                            </td>
+                            <td>
+                                <%= new Date(ticket.created_at).toLocaleString('en-PH', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) %>
+                            </td>
+                            <td>
+                                <a href="/tickets/view/<%= ticket.ticket_id %>?backUrl=<%= encodeURIComponent(currentUrl) %>" class="small-btn btn">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+</div>  
+
+<%- include('footer') %>
+<script>
+    setTimeout(() => {
+        location.reload();
+    }, 60000);
+
+    function confirmLogout() {
+        showConfirm("Are you sure you want to logout?", function () {
+            window.location.href = "/logout";
+        });
+    }
+</script>
+</body>
+</html>
+

@@ -278,7 +278,7 @@ input:focus, textarea:focus, select:focus {
 .table {
     width: 100%;
     border-collapse: collapse;
-    overflow: hidden;
+    overflow: visible;
     border-radius: 15px;
 }
 
@@ -658,6 +658,67 @@ input:focus, textarea:focus, select:focus {
     white-space: nowrap;
 }
 
+.monitor-container{
+    margin-top: 10px;
+}
+
+.monitor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+    margin-bottom: 25px;
+}
+
+.monitor-title {
+    flex: 1;
+}
+
+.monitor-title h1 {
+    margin: 0 0 10px 0;
+}
+
+.refresh-info {
+    color: #aaa;
+    margin: 0;
+}
+
+.monitor-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.monitor-stat-card {
+    min-width: 140px;
+    background: #16213e;
+    border-radius: 10px;
+    padding: 12px 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.monitor-stat-card h2 {
+    font-size: 1.8rem;
+}
+
+.monitor-stat-card span {
+    display: block;
+    color: #ccc;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.monitor-stat-card h2 {
+    margin: 0;
+    color: white;
+    font-size: 2rem;
+}
+
+.monitor-stat-card:last-child {
+    border-left: 5px solid #dc3545;
+}
+
 .admin-tag {
     background: rgba(251,191,36,0.15);
     color: #fde68a;
@@ -797,6 +858,11 @@ input:focus, textarea:focus, select:focus {
 
 .p1-row {
     border-left: 5px solid #dc3545;
+}
+
+.p1-card {
+    border-left: 5px solid #dc3545;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.25);
 }
 
 .info-card {
@@ -989,6 +1055,35 @@ input:focus, textarea:focus, select:focus {
 
 .overview-card h3 {
     color: #997406;
+}
+
+.overview-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.stat-box {
+    flex: 1;
+    min-width: 150px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+}
+
+.stat-box span {
+    display: block;
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.stat-box h2 {
+    margin: 0;
+    color: #0a2342;
+    font-size: 2rem;
 }
 
 .admin-tag {

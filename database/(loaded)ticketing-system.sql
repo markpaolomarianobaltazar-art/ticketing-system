@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 16, 2026 at 01:15 PM
+-- Generation Time: Jun 04, 2026 at 04:55 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,15 +44,11 @@ CREATE TABLE `tickets` (
 --
 
 INSERT INTO `tickets` (`ticket_id`, `title`, `description`, `priority`, `status`, `created_by`, `assigned_to`, `created_at`, `updated_at`) VALUES
-(1, 'Login Issue', 'Cannot login to system', 'P1', 'open', 5, NULL, '2026-04-10 14:21:19', '2026-04-10 14:26:47'),
-(2, 'Page Error', 'Dashboard crashes', 'P2', 'in_progress', 5, 1, '2026-04-10 14:21:19', '2026-04-10 14:27:39'),
-(3, 'Password Reset', 'Reset email not received', 'P3', 'resolved', 5, NULL, '2026-04-10 14:21:19', '2026-04-10 14:27:53'),
-(4, 'UI Bug', 'Button not clickable', 'P4', 'open', 5, NULL, '2026-04-10 14:21:19', '2026-04-10 14:28:06'),
-(5, 'Slow System', 'System is lagging', 'P5', 'closed', 5, NULL, '2026-04-10 14:21:19', '2026-04-10 14:28:15'),
-(6, 'Mouse not working', 'My mouse is nuts', 'P1', 'open', 5, NULL, '2026-04-11 14:59:25', '2026-04-11 14:59:25'),
-(7, 'A new ticket', 'TEsting this supreme ticket', 'P4', 'open', 3, NULL, '2026-04-11 15:03:02', '2026-04-11 15:03:02'),
-(8, 'P1 Issue', 'Testing only', 'P5', 'open', 5, NULL, '2026-04-13 08:28:23', '2026-04-13 08:28:23'),
-(9, 'Ticket with comment', 'This is a ticket with comment', 'P3', 'open', 5, NULL, '2026-04-13 15:15:36', '2026-04-13 15:15:36');
+(1, 'Cannot access email', 'Please check my MS outlook. I can\'t access my emails', 'P3', 'open', 4, 3, '2026-06-04 14:42:20', '2026-06-04 14:49:57'),
+(2, 'Laptop running slow', 'I really need my laptop to continue operation. Please fix urgently', 'P1', 'open', 5, 2, '2026-06-04 14:43:44', '2026-06-04 14:48:16'),
+(3, 'VPN connection failed', 'My VPN app is not running correctly', 'P4', 'open', 6, NULL, '2026-06-04 14:44:48', '2026-06-04 14:44:48'),
+(4, 'Printer issue', 'Please check printer, not working properly', 'P5', 'closed', 6, 2, '2026-06-04 14:47:46', '2026-06-04 14:53:03'),
+(5, 'Network Issue', 'I\'ve found a router issue. I am also looking into this and will keep you posted', 'P1', 'open', 3, 3, '2026-06-04 14:51:50', '2026-06-04 14:51:50');
 
 -- --------------------------------------------------------
 
@@ -73,20 +69,18 @@ CREATE TABLE `ticket_comments` (
 --
 
 INSERT INTO `ticket_comments` (`comment_id`, `ticket_id`, `user_id`, `comment`, `created_at`) VALUES
-(1, 1, 7, 'I am checking your issue now.', '2026-04-13 09:12:50'),
-(2, 1, 6, 'Thank you, please update me.', '2026-04-13 09:12:50'),
-(3, 1, 7, 'Issue identified. Working on fix.', '2026-04-13 09:12:50'),
-(4, 2, 6, 'Can you provide more details?', '2026-04-13 09:12:50'),
-(5, 2, 7, 'Yes, the error appears when logging in.', '2026-04-13 09:12:50'),
-(6, 3, 7, 'This should be resolved now.', '2026-04-13 09:12:50'),
-(7, 3, 2, 'Confirmed working. Thanks!', '2026-04-13 09:12:50'),
-(8, 4, 3, 'Assigned to network team.', '2026-04-13 09:12:50'),
-(9, 5, 7, 'Looking into this.', '2026-04-13 09:12:50'),
-(10, 6, 2, 'Please restart your device and try again.', '2026-04-13 09:12:50'),
-(11, 7, 6, 'We are escalating this issue.', '2026-04-13 09:12:50'),
-(12, 8, 7, 'Fix deployed. Please verify.', '2026-04-13 09:12:50'),
-(13, 9, 5, 'This is a ticket with comment', '2026-04-13 15:15:36'),
-(14, 9, 5, 'Testing comment via customer update page', '2026-04-13 15:20:23');
+(1, 1, 4, 'Please check my MS outlook. I can\'t access my emails', '2026-06-04 14:42:20'),
+(2, 2, 5, 'I really need my laptop to continue operation. Please fix urgently', '2026-06-04 14:43:44'),
+(3, 3, 6, 'My VPN app is not running correctly', '2026-06-04 14:44:48'),
+(4, 4, 6, 'Please check printer, not working properly', '2026-06-04 14:47:46'),
+(5, 2, 2, 'Ticket assigned to Sarah Reyes by Sarah Reyes (technician)', '2026-06-04 14:48:16'),
+(6, 2, 2, 'I am looking into this.', '2026-06-04 14:48:39'),
+(7, 1, 3, 'Ticket assigned to Kevin Cruz by Kevin Cruz (technician)', '2026-06-04 14:49:57'),
+(8, 1, 3, 'Can you try to restart MS outlook?, if that didn\'t work try to restart your device', '2026-06-04 14:50:46'),
+(9, 5, 3, 'I\'ve found a router issue. I am also looking into this and will keep you posted', '2026-06-04 14:51:51'),
+(10, 4, 2, 'Ticket assigned to Sarah Reyes by Sarah Reyes (technician)', '2026-06-04 14:52:54'),
+(11, 4, 2, 'This ticket was closed by Sarah Reyes (technician)', '2026-06-04 14:53:03'),
+(12, 5, 1, 'Any update on this issue?', '2026-06-04 14:54:18');
 
 -- --------------------------------------------------------
 
@@ -102,21 +96,21 @@ CREATE TABLE `users` (
   `contact` varchar(20) DEFAULT NULL,
   `role` enum('admin','technician','customer') NOT NULL,
   `position` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` enum('active','inactive') DEFAULT 'active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `email`, `password`, `full_name`, `contact`, `role`, `position`, `created_at`) VALUES
-(1, 'admin@test.com', '$2b$10$.CXRF2aZoNa4WEbPBAVUoendxZXNx/ywoI5wT/T8YCZSgzSbirn8y', 'Admin User', NULL, 'admin', NULL, '2026-04-09 14:46:46'),
-(2, 'tech@test.com', '$2b$10$E0NvZ9mvqXhD0ukDTqV08uQ9WHNQ3QYLVNWJjYSVirQs5mYeIdrza', 'Technician User', NULL, 'technician', NULL, '2026-04-09 14:46:46'),
-(3, 'Test@test.com', '$2b$10$30sn8woFlXl3yw1v0DJeEOi25BYhrHFkfJc3PLy.GDeQFM.K7Fd4e', 'Test', NULL, 'customer', NULL, '2026-04-09 14:54:46'),
-(5, 'thetest@test.com', '$2b$10$lMmmjTrM5j/yiQwLj4YlC.kkVfdfMWbSuB6BdZ.CgCK.4UZ5u1O2u', 'Testing purpose', NULL, 'customer', NULL, '2026-04-10 14:10:37'),
-(6, 'tech1@email.com', '$2b$10$kElkoIIdoBfbir8ELvSg/Oku7rPAadHPFY/GZn7y4KSdv8Gp4u.zG', 'Juan Dela Cruz', NULL, 'technician', 'IT Support', '2026-04-13 09:08:43'),
-(7, 'tech2@email.com', '$2b$10$Tp558LOORyzx/SC27itky.Ufkn1ew0sIoITnHld1Jiw7nNVfh2v2e', 'Maria Santos', NULL, 'technician', 'Network Engineer', '2026-04-13 09:08:43'),
-(8, 'testnum@test.com', '$2b$10$6meEJhNHax8uNjohblLVcuMmOzdwqLeC8B/EUnAv2Wz3ug.vH8cJ.', 'Testing with number', '0978947456', 'customer', NULL, '2026-04-15 08:00:30');
+INSERT INTO `users` (`user_id`, `email`, `password`, `full_name`, `contact`, `role`, `position`, `created_at`, `status`) VALUES
+(1, 'michael.santos@mbitsolutions.com', '$2b$10$1/1uDB83wG7LPvYk.z13j.oL9am1LglowL6xY4cpIjOm1afEp.4by', 'Michael Santos', NULL, 'admin', NULL, '2026-06-04 14:20:08', 'active'),
+(2, 'sarah.reyes@mbitsolutions.com', '$2b$10$rhd7ZgSLL6bg75jqhqs76uuChmUcA3bHHUoGscazj9/Jji3YcutW.', 'Sarah Reyes', '09159874521', 'technician', NULL, '2026-06-04 14:21:40', 'active'),
+(3, 'kevin.cruz@mbitsolutions.com', '$2b$10$fYLYTDk3Et/516NKP2FyRu/PM8L3qVuI2AF1azRvugnv4b9OvVuvm', 'Kevin Cruz', '09237519876', 'technician', NULL, '2026-06-04 14:30:06', 'active'),
+(4, 'anna.villanueva@acmecorp.com', '$2b$10$J34YrAPnI4BBTTu0dj3gnOorOeNFlGU0MpqIP0JnuYucIeGOOoK9u', 'Anna Villanueva', '09453587964', 'customer', NULL, '2026-06-04 14:31:21', 'active'),
+(5, 'mark.garcia@acmecorp.com', '$2b$10$FaBiGB3X.SSif7N8Nw3Rv..2P/cp0AFpihW6pqc1G3plbBqXWGHbS', 'Mark Garcia', '09876341256', 'customer', NULL, '2026-06-04 14:36:25', 'active'),
+(6, 'patricia.mendoza@acmecorp.com', '$2b$10$ArkGQ9ZYB.JvFlaWP99oy.PnfRL6lrDFmfxzURIwL/tjmmgAgVpR6', 'Patricia Mendoza', '09163785428', 'customer', NULL, '2026-06-04 14:37:13', 'active');
 
 --
 -- Indexes for dumped tables
@@ -153,19 +147,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `tickets`
 --
 ALTER TABLE `tickets`
-  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `ticket_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `ticket_comments`
 --
 ALTER TABLE `ticket_comments`
-  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
