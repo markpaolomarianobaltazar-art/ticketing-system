@@ -456,6 +456,12 @@ input:focus, textarea:focus, select:focus {
     animation: fadeIn 0.2s ease;
 }
 
+.comments-section {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
 .comment.customer {
     background: rgba(59,130,246,0.12);
     border-right: 4px solid #3b82f6;
@@ -501,10 +507,14 @@ input:focus, textarea:focus, select:focus {
 }
 
 .comment-form {
-    margin-top: 30px;
     display: flex;
-    gap: 14px;
-    align-items: flex-end;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-actions {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .comment-form textarea {

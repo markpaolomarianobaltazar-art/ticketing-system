@@ -200,9 +200,8 @@
             </div>
         </div>
     </div>
-<div class="comments-section">
     <h4>Comments</h4>
-
+<div class="comments-section">
     <% if (comments.length === 0) { %>
         <p>No comments yet</p>
     <% } %>
@@ -232,9 +231,11 @@
     <form id="commentForm" method="POST" action="/comments/add" class="comment-form">
     <textarea name="comment" placeholder="Write a reply..." required><%= formData || '' %></textarea>
     <input type="hidden" name="ticket_id" value="<%= ticket.ticket_id %>">
-    <button type="button" class="btn" onclick="confirmAddComment()">
-        Send
-    </button>
+    <div class="comment-actions">
+        <button type="button" class="btn" onclick="confirmAddComment()">
+            Send
+        </button>
+    </div>
 </form>
 <% } if (ticket.status === 'closed' && (userId === ticket.created_by || role === 'admin')) { %>
     <p class="text-muted">This ticket is closed. Comments are disabled.</p>
@@ -288,7 +289,14 @@
     showConfirm("Update ticket priority?", function () {
         document.getElementById("priorityForm").submit();
     });
-}
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+    const commentsSection = document.querySelector('.comments-section');
+
+    if (commentsSection) {
+        commentsSection.scrollTop = commentsSection.scrollHeight;
+    }
+});
 </script>
 
 <% if (modalMessage) { %>
