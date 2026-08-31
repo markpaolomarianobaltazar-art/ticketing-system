@@ -35,70 +35,76 @@
                 </p>
             </div>
             <form id="createTicketForm" action="/tickets/create" method="POST" class="form-create">
-          <div class="form-group">
-              <label>Title</label>
-              <input type="text" name="title" placeholder="Enter ticket title" value="<%= formData.title || '' %>" required>
-          </div>
-          <div class="form-group">
-              <label>Description</label>
-              <textarea name="description" placeholder="Describe the issue in detail..."required><%= formData.description || '' %></textarea>
-              <small>
-                This will become the first message in the ticket conversation.
-              </small>
-          </div>
-          <div class="form-group">
-              <label>Priority</label>
-              <select name="priority">
-                <option value="P1"
-                <%= formData.priority === 'P1' ? 'selected' : '' %>>
-                    P1 - Critical
-                </option>
-                <option value="P2"
-                <%= formData.priority === 'P2' ? 'selected' : '' %>>
-                    P2 - High
-                </option>
-                <option value="P3"
-                <%= (!formData.priority || formData.priority === 'P3') ? 'selected' : '' %>>
-                    P3 - Medium
-                </option>
-                <option value="P4"
-                <%= formData.priority === 'P4' ? 'selected' : '' %>>
-                    P4 - Low
-                </option>
-                <option value="P5"
-                <%= formData.priority === 'P5' ? 'selected' : '' %>>
-                    P5 - Very Low
-                </option>
-              </select>
-          </div>
-      
-          <% if (role === 'technician') { %>
-          <div class="form-group">
-              <label>Assign Technician</label>
-              <select name="assigned_to">
-                  <option value="">Unassigned</option>
-                  <option value="<%= currentUserId %>" selected>
-                      Assign to Me
-                  </option>
-                  <% technicians.forEach(tech => { %>
-                      <% if (tech.user_id !== currentUserId) { %>
-                          <option value="<%= tech.user_id %>">
-                              <%= tech.full_name %>
-                          </option>
-                      <% } %>
-                  <% }) %>
-              </select>
-          </div>
-          <% } %>
-          <div class="form-actions">
-            <button type="button" class="btn secondary-btn" onclick="clearTicketForm()">
-                Clear
-            </button>
-            <button type="button" class="btn create-btn" onclick="confirmCreateTicket()">
-                Create Ticket
-            </button>
-        </div>
-      </form>
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" placeholder="Enter ticket title" value="<%= formData.title || '' %>"  required>
+                </div>
+                <div class="form-group description-group">
+                    <label for="description">Description</label>
+                    <div class="description-field">
+                        <textarea id="description" name="description" placeholder="Describe the issue in detail..." required >
+                            <%= formData.description || '' %></textarea>
+                        <small>
+                            This will become the first message in the ticket conversation.
+                        </small>
+                    </div>
+                </div>
+            
+                <div class="form-group compact-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority">
+                        <option value="P1"
+                            <%= formData.priority === 'P1' ? 'selected' : '' %>>
+                            P1 - Critical
+                        </option>
+                        <option value="P2"
+                            <%= formData.priority === 'P2' ? 'selected' : '' %>>
+                            P2 - High
+                        </option>
+                        <option value="P3"
+                            <%= (!formData.priority || formData.priority === 'P3') ? 'selected' : '' %>>
+                            P3 - Medium
+                        </option>
+                        <option value="P4"
+                            <%= formData.priority === 'P4' ? 'selected' : '' %>>
+                            P4 - Low
+                        </option>
+                        <option value="P5"
+                            <%= formData.priority === 'P5' ? 'selected' : '' %>>
+                            P5 - Very Low
+                        </option>
+                    </select>
+                </div>
+            
+                <% if (role === 'technician') { %>
+            
+                <div class="form-group compact-group">
+                    <label for="assigned_to">Assign Technician</label>
+                    <select id="assigned_to" name="assigned_to">
+                        <option value="">Unassigned</option>
+                        <option value="<%= currentUserId %>" selected>
+                            Assign to Me
+                        </option>
+                        <% technicians.forEach(tech => { %>
+                            <% if (tech.user_id !== currentUserId) { %>
+                                <option value="<%= tech.user_id %>">
+                                    <%= tech.full_name %>
+                                </option>
+                            <% } %>
+                        <% }) %>
+                    </select>
+                </div>
+                <% } %>
+            
+                <div class="form-actions">
+                    <button type="button" class="btn secondary-btn" onclick="clearTicketForm()">
+                        Clear
+                    </button>
+                    <button type="button" class="btn create-btn" onclick="confirmCreateTicket()">
+                        Create Ticket
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

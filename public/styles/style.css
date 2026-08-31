@@ -374,60 +374,149 @@ input:focus, textarea:focus, select:focus {
     font-size: 16px;
 }
 
+.form-card {
+    width: 100%;
+    max-width: 820px;
+    margin: 30px auto;
+    padding: 32px;
+    border-radius: 18px;
+
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    backdrop-filter: blur(8px);
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+
+/* PAGE TITLE */
+
+.form-card .page-title {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.form-card .page-title h1 {
+    margin-bottom: 6px;
+}
+
+.form-card .page-title p {
+    margin: 0;
+    color: #cbd5e1;
+}
+
 .form-create {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 16px;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 145px 1fr;
+    align-items: center;
+    column-gap: 18px;
 }
 
-.form-group label {
-    margin-bottom: 10px;
-    font-weight: bold;
-    font-size: 15px;
+.form-group > label {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f8fafc;
+    text-align: right;
 }
 
 .form-create input,
 .form-create textarea,
 .form-create select {
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.08);
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 13px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.08);
     color: white;
-    font-size: 15px;
+    font-size: 14px;
     outline: none;
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
 }
+
+.form-create input:focus,
+.form-create textarea:focus,
+.form-create select:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.11);
+}
+
+.form-create input::placeholder,
+.form-create textarea::placeholder {
+    color: #94a3b8;
+}
+
+.description-group {
+    align-items: start;
+}
+
+.description-group > label {
+    padding-top: 11px;
+}
+
+.description-field {
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* TEXTAREA */
 
 .form-create textarea {
-    min-height: 160px;
+    min-height: 125px;
     resize: vertical;
+    line-height: 1.5;
 }
+
+
+/* DESCRIPTION NOTE */
 
 .form-create small {
-    margin-top: 8px;
-    color: #cbd5e1;
+    margin-top: 7px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
 }
 
-.form-card {
-    width: 100%;
-    max-width: 850px;
-    margin: 40px auto;
-    padding: 40px;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+
+/* COMPACT SELECTS */
+
+.compact-group select {
+    width: 300px;
+    max-width: 100%;
 }
+
+
+/* SELECT OPTIONS */
 
 .form-create option {
     background: #1e293b;
     color: white;
+}
+
+
+/* FORM BUTTONS */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin-top: 8px;
+    padding-top: 18px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .full-btn {
